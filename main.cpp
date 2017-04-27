@@ -13,38 +13,28 @@ using namespace cv;
 using namespace std;
 
 
-int colorRound(int color){//rounds 255 value to 255, 170, 85, 0
-    if(color>127){
-        return 255;
-    }
-    else{
-        return 0;
-    }
-}
-
 int main()
 {
 //g++ -o main main.cpp `pkg-config opencv --cflags --libs`
         Mat image;
 
-        ofstream red;
-        ofstream green;
-        ofstream blue;
+        ofstream red;//file that the red values will be written in to
+        ofstream green;//file that the green values will be written in to
+        ofstream blue;//file that the blue values will be written in to
 
         red.open("red.txt");
         green.open("green.txt");
         blue.open("blue.txt");
 
 
-       // LOAD image
-        image = imread("smile.jpg", CV_LOAD_IMAGE_COLOR);
+        image = imread("bliss.png", CV_LOAD_IMAGE_COLOR);//opens image using openCV imread
 
-        int numR = 23;
-        int numC = 14;
-        int incrementR = image.rows/numR;
-        int incrementC = image.cols/numC;
+        int numR = 23;//number of rows
+        int numC = 14;//number of columns
+        int incrementR = image.rows/numR;//height of row in pixels
+        int incrementC = image.cols/numC;//width of column in pixels
 
-
+        //translates x and y coordinates on a grid into an index on the "snake" of led.
         int toSnake[numC][numR] = {
             {-1 ,-1 ,-1 ,-1 ,-1 ,17 ,16 ,15 ,14 ,13 ,12 ,11 ,10 ,9  ,8  ,7  ,6  ,5  ,4  ,3  ,2  ,1  ,0  },
             {-1 ,-1 ,-1 ,18 ,19 ,20 ,21 ,22 ,23 ,24 ,25 ,26 ,27 ,28 ,29 ,30 ,31 ,32 ,33 ,34 ,35 ,36, 37 },
@@ -62,25 +52,23 @@ int main()
             {-1 ,-1 ,-1 ,-1 ,-1 ,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297},
         };
 
-        int row = (numR)*incrementR;
-        int col = (numC)*incrementC;
+        int row = (numR)*incrementR;//new, slightly cropped height of picture in order for it to be divided equally
+        int col = (numC)*incrementC;//new width
 
-        Rect roi(image.cols-col, image.rows-row, col, row);
+        Rect roi(image.cols-col, image.rows-row, col, row);//crop image
         Mat image_roi = image(roi);
         image_roi.copyTo(image);
 
-        cout<<"col "<<col <<" row "<< row<<endl;
         int blueAvg[numC][numR]= {};
         int greenAvg[numC][numR] = {};
         int redAvg[numC][numR] ={};
 
-        int reds[298] = {};
-        int greens[298] = {};
-        int blues[298] = {};
+        int snakeLen = 298;
 
-        cout<<col/incrementC << "col "<<incrementR<<endl;
+        int reds[snakeLen] = {};
+        int greens[snakeLen] = {};
+        int blues[snakeLen] = {};
 
-        cout<<blueAvg<<endl;
 
         for(int x = 0; x <col;x=x+1){
             for(int y = 0; y<row;y=y+1){
@@ -90,31 +78,28 @@ int main()
 
             }
         }
-        int howMany =0;
         int code;
         for(int x = 0; x <numC;x=x+1){
             for(int y = 0; y<numR;y=y+1){
                 code = toSnake[x][y];
-
                 if(code!=-1){
-                    blueAvg[x][y] = colorRound(blueAvg[x][y]/(incrementR*incrementC));
-                    greenAvg[x][y] = colorRound(greenAvg[x][y]/(incrementR*incrementC));
-                    redAvg[x][y] = colorRound(redAvg[x][y]/(incrementR*incrementC));
-                    reds[code] =redAvg[x][y];
-                    blues[code] =blueAvg[x][y];
-                    greens[code] =greenAvg[x][y];
-                    howMany +=1;
+                    blueAvg[x][y] = blueAvg[x][y]/(incrementR*incrementC);
+                    greenAvg[x][y] = greenAvg[x][y]/(incrementR*incrementC);
+                    redAvg[x][y] = redAvg[x][y]/(incrementR*incrementC);
                 }
                 else{
                     blueAvg[x][y] = 0;
                     greenAvg[x][y] = 0;
                     redAvg[x][y] = 0;
                 }
+                reds[code] =redAvg[x][y];
+                blues[code] =blueAvg[x][y];
+                greens[code] =greenAvg[x][y];
             }
         }
 
 
-        for(int i =0;i<numC*numR;i=i+1){
+        for(int i =0;i<snakeLen;i=i+1){
             red<<reds[i]<<",";
             green<<greens[i]<<",";
             blue<<blues[i]<<",";
@@ -138,11 +123,11 @@ int main()
         return -1;
         }
 
-       //DISPLAY image
-       namedWindow( "window", CV_WINDOW_NORMAL); // Create a window for display.
-       imshow( "window", image ); // Show our image inside it.
-       //SAVE image
-       imwrite("result.jpg",image);// it will store the image in name "result.jpg"
+       //display
+       namedWindow( "window", CV_WINDOW_NORMAL);
+       imshow( "window", image );
+       //save
+       imwrite("final.jpg",image);
 
        waitKey(0);                       // Wait for a keystroke in the window
        return 0;
