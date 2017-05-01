@@ -22,12 +22,12 @@ int main()
         ofstream green;//file that the green values will be written in to
         ofstream blue;//file that the blue values will be written in to
 
-        red.open("red.txt");
-        green.open("green.txt");
-        blue.open("blue.txt");
+        red.open("output/red.txt");
+        green.open("output/green.txt");
+        blue.open("output/blue.txt");
 
 
-        image = imread("bliss.png", CV_LOAD_IMAGE_COLOR);//opens image using openCV imread
+        image = imread("images/mona.jpg", CV_LOAD_IMAGE_COLOR);//opens image using openCV imread
 
         int numR = 23;//number of rows
         int numC = 14;//number of columns
@@ -127,7 +127,7 @@ int main()
        namedWindow( "window", CV_WINDOW_NORMAL);
        imshow( "window", image );
        //save
-       imwrite("final.jpg",image);
+       imwrite("output/final.jpg",image);
 
        waitKey(0);                       // Wait for a keystroke in the window
        return 0;
