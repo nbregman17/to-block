@@ -26,9 +26,18 @@ int main()
         green.open("output/green.txt");
         blue.open("output/blue.txt");
 
-
-        image = imread("images/mona.jpg", CV_LOAD_IMAGE_COLOR);//opens image using openCV imread
-
+        string filename="mona.jpg";
+        cout<<"Enter filename with .png or .jpg extension"<<endl;
+        cin>>filename;
+        filename = "images/" + filename;
+        ifstream testfile(filename.c_str());//checking that the file exists
+        if (testfile) {
+            image = imread(filename, CV_LOAD_IMAGE_COLOR);//opens image using openCV imread
+        }
+        else{
+            cout<<"That file does not exist."<<endl;
+            return 0;
+        }
         int numR = 23;//number of rows
         int numC = 14;//number of columns
         int incrementR = image.rows/numR;//height of row in pixels
